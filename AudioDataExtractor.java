@@ -12,6 +12,7 @@ public class AudioDataExtractor
     private float[] samples;
     private int bytesPerFrame;
     private int sampleSizeInBits;
+    private int numberOfChannels;
 
 
     AudioInputStream audioInputStream;
@@ -23,6 +24,7 @@ public class AudioDataExtractor
         audioFormat = audioInputStream.getFormat();
         bytesPerFrame = audioFormat.getFrameSize();
         sampleSizeInBits = audioFormat.getSampleSizeInBits();
+        numberOfChannels = audioFormat.getChannels();
 
         extractSamples();
     }
@@ -30,6 +32,11 @@ public class AudioDataExtractor
     public float[] getSamples()
     {
         return samples;
+    }
+
+    public int getChannels()
+    {
+        return numberOfChannels;
     }
 
     private void extractSamples() throws IOException, UnsupportedAudioFileException

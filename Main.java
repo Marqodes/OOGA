@@ -11,11 +11,12 @@ public class Main
     public static int HEIGHT = 450;
     public static void main(String[] args) throws UnsupportedAudioFileException, IOException, LineUnavailableException
     {
-        File audioFile = loadFile("media\\AudioClip.wav");
-        // File audioFile = loadFile("media\\DarkFant.wav");
+        // File audioFile = loadFile("media\\Audio2.wav");
+        // File audioFile = loadFile("media\\JCole.wav");
+        File audioFile = loadFile("media\\DarkFant.wav");
 
         AudioDataExtractor audioDataExtractor = new AudioDataExtractor(audioFile);
-        DrawWaveformPanel drawWaveformPanel = new DrawWaveformPanel(audioDataExtractor.getSamples());
+        DrawWaveformPanel drawWaveformPanel = new DrawWaveformPanel(audioDataExtractor.getSamples(), audioDataExtractor.getChannels());
 
         JFrame frame = new JFrame("OOGA");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
