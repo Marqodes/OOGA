@@ -1,5 +1,7 @@
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -9,11 +11,12 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class AudioDataExtractor 
 {
-    private float[] samples;
     private int bytesPerFrame;
     private int sampleSizeInBits;
     private int numberOfChannels;
 
+    private float[] monoSamples;
+    private float[][] stereoSamples;
 
     AudioInputStream audioInputStream;
     AudioFormat audioFormat;
@@ -26,12 +29,14 @@ public class AudioDataExtractor
         sampleSizeInBits = audioFormat.getSampleSizeInBits();
         numberOfChannels = audioFormat.getChannels();
 
-        extractSamples();
-    }
-
-    public float[] getSamples()
-    {
-        return samples;
+        if(getChannels() == 1)
+        {
+            extractMonoSamples();
+        }
+        else
+        {
+            extractStereoSamples();
+        }
     }
 
     public int getChannels()
@@ -39,12 +44,22 @@ public class AudioDataExtractor
         return numberOfChannels;
     }
 
-    private void extractSamples() throws IOException, UnsupportedAudioFileException
+    public float[][] getStereoSamples()
+    {
+        return stereoSamples;
+    }
+
+    public float[] getMonoSamples()
+    {
+        return monoSamples;
+    }
+
+    private void extractMonoSamples() throws IOException, UnsupportedAudioFileException
     {
         byte[] audioBytes = audioInputStream.readAllBytes();
         int numberOfSamples = audioBytes.length / bytesPerFrame;
 
-        samples = new float[numberOfSamples];
+        monoSamples = new float[numberOfSamples];
 
         float normalizationFactor;
         if(sampleSizeInBits == 16)
@@ -76,7 +91,29 @@ public class AudioDataExtractor
             }
 
             // Normalize the sample
-            samples[i] = currentSample / normalizationFactor;
+            monoSamples[i] = currentSample / normalizationFactor;
+        }
+    }
+
+    // currently only 16-bit audio
+    private void extractStereoSamples() throws IOException
+    {
+        byte[] audioBytes = audioInputStream.readAllBytes();
+        int numberOfSamples = audioBytes.length / bytesPerFrame;
+
+        stereoSamples = new float[2][numberOfSamples];
+
+        ByteBuffer buffer = ByteBuffer.wrap(audioBytes).order(ByteOrder.LITTLE_ENDIAN);
+        
+        for(int i = 0; i < numberOfSamples; i++)
+        {
+            // left channel
+            short leftSample = buffer.getShort();
+            stereoSamples[0][i] = leftSample / 32768f; // Normalize to -1.0f to 1.0f
+
+            // Extract right channel sample
+            short rightSample = buffer.getShort();
+            stereoSamples[1][i] = rightSample / 32768f; // Normalize to -1.0f to 1.0f
         }
     }
     

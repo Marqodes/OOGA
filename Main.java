@@ -9,14 +9,24 @@ public class Main
 {
     public static int WIDTH  = 850;
     public static int HEIGHT = 450;
+    public static DrawWaveformPanel drawWaveformPanel;
     public static void main(String[] args) throws UnsupportedAudioFileException, IOException, LineUnavailableException
     {
-        // File audioFile = loadFile("media\\Audio2.wav");
+        File audioFile = loadFile("media\\Audio2.wav");
         // File audioFile = loadFile("media\\JCole.wav");
-        File audioFile = loadFile("media\\DarkFant.wav");
+        // File audioFile = loadFile("media\\DarkFant.wav");
+        // File audioFile = loadFile("media\\LeftRight.wav");
 
         AudioDataExtractor audioDataExtractor = new AudioDataExtractor(audioFile);
-        DrawWaveformPanel drawWaveformPanel = new DrawWaveformPanel(audioDataExtractor.getSamples(), audioDataExtractor.getChannels());
+
+        if(audioDataExtractor.getChannels() == 1)
+        {
+            drawWaveformPanel = new DrawWaveformPanel(audioDataExtractor.getMonoSamples(), audioDataExtractor.getChannels());
+        }
+        else if(audioDataExtractor.getChannels() == 2)
+        {
+            drawWaveformPanel = new DrawWaveformPanel(audioDataExtractor.getStereoSamples(), audioDataExtractor.getChannels());
+        }
 
         JFrame frame = new JFrame("OOGA");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

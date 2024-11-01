@@ -5,14 +5,19 @@ import java.awt.Graphics2D;
 
 public class DrawWaveformPanel extends JPanel
 {
-    private float[] samples;
     private int numberOfChannels;
-    private float[] leftChannel;
-    private float[] rightChannel;
+    private float[] monoSamples;
+    private float[][] stereoSamples;
 
-    public DrawWaveformPanel(float[] samples, int numberOfChannels)
+    public DrawWaveformPanel(float[] monoSamples, int numberOfChannels)
     {
-        this.samples = samples;
+        this.monoSamples = monoSamples;
+        this.numberOfChannels = numberOfChannels;
+    }
+    
+    public DrawWaveformPanel(float[][] stereoSamples, int numberOfChannels)
+    {
+        this.stereoSamples = stereoSamples;
         this.numberOfChannels = numberOfChannels;
     }
 
@@ -27,60 +32,68 @@ public class DrawWaveformPanel extends JPanel
     {
         Graphics2D g2 = (Graphics2D) g;
 
+        if(numberOfChannels == 1)
+        {
+            drawMonoWaveForm(g2, monoSamples);
+        }
+        else
+        {
+            drawStereoWaveForm(g2, stereoSamples);
+        }
+    }
+
+    private void drawMonoWaveForm(Graphics2D g2, float[] singleChannelSamples)
+    {
         int panelWidth = getWidth();
         int panelHeight = getHeight();
         int centerY = panelHeight / 2;
 
         float maxAmplitude = 1.0f;
         
-        if(numberOfChannels == 1)
+        int scaledHeight = (int) (panelHeight / 2.0f * maxAmplitude);
+        for(int i = 0; i < singleChannelSamples.length -1; i++)
         {
-            int scaledHeight = (int) (panelHeight / 2.0f * maxAmplitude);
-            for(int i = 0; i < samples.length -1; i++)
-            {
-                int x1 = (int) ((i / (float) samples.length) * panelWidth);
-                int y1 = centerY - (int) (samples[i] * scaledHeight);
-                int x2 = (int) (((i + 1) / (float) samples.length) * panelWidth);
-                int y2 = centerY - (int) (samples[i + 1] * scaledHeight);
-    
-                // draw line between two points
-                g2.drawLine(x1, y1, x2, y2);
-            }
-        }
-        else
-        {
-            spiltStereoSamples();
-            drawStereoWaveForm(g2, leftChannel, 0, centerY);
-            drawStereoWaveForm(g2, rightChannel, centerY + 1, panelHeight);
+            int x1 = (int) ((i / (float) singleChannelSamples.length) * panelWidth);
+            int y1 = centerY - (int) (singleChannelSamples[i] * scaledHeight);
+            int x2 = (int) (((i + 1) / (float) singleChannelSamples.length) * panelWidth);
+            int y2 = centerY - (int) (singleChannelSamples[i + 1] * scaledHeight);
+
+            // draw line between two points
+            g2.drawLine(x1, y1, x2, y2);
         }
     }
 
-    private void spiltStereoSamples()
-    { 
-        leftChannel = new float[samples.length / 2];
-        rightChannel = new float[samples.length / 2];
-        for(int i = 0, j = 0; i < samples.length; i += 2, j++)
-        {
-            leftChannel[j] = samples[i];
-            rightChannel[j] = samples[i + 1];
-        }
-    }
-
-    private void drawStereoWaveForm(Graphics2D g2, float[] channelSamples, int yStart, int yEnd)
+    private void drawStereoWaveForm(Graphics2D g2, float[][] dualChannelSamples)
     {
-
         int panelWidth = getWidth();
-        int midY = (yStart + yEnd) / 2;
-        int numberOfSamples = channelSamples.length;
-        float xScale = (float) panelWidth / numberOfSamples;
+        int panelHeight = getHeight();
+        int halfHeight = panelHeight / 2;
 
-        for(int i = 0; i < numberOfSamples - 1; i++)
+        // Scaling factors for vertical amplitude (centered at y midpoint of each half)
+        int leftChannelYCenter = halfHeight / 2;
+        int rightChannelYCenter = halfHeight + halfHeight / 2;
+        float xScale = (float) panelWidth / dualChannelSamples[0].length;
+
+        // Draw Left Channel
+        for (int i = 0; i < dualChannelSamples[0].length - 1; i++) 
         {
-            int x1 = Math.round(i * xScale);
-            int x2 = Math.round((i + 1) * xScale);
+            int x1 = (int) (i * xScale);
+            int x2 = (int) ((i + 1) * xScale);
 
-            int y1 = midY - Math.round(channelSamples[i] * (yEnd - yStart) / 2);
-            int y2 = midY - Math.round(channelSamples[i + 1] * (yEnd - yStart) / 2);
+            int y1 = leftChannelYCenter - (int) (dualChannelSamples[0][i] * (halfHeight / 2));
+            int y2 = leftChannelYCenter - (int) (dualChannelSamples[0][i + 1] * (halfHeight / 2));
+
+            g2.drawLine(x1, y1, x2, y2);
+        }
+
+        // Draw Right Channel
+        for (int i = 0; i < dualChannelSamples[1].length - 1; i++) 
+        {
+            int x1 = (int) (i * xScale);
+            int x2 = (int) ((i + 1) * xScale);
+
+            int y1 = rightChannelYCenter - (int) (dualChannelSamples[1][i] * (halfHeight / 2));
+            int y2 = rightChannelYCenter - (int) (dualChannelSamples[1][i + 1] * (halfHeight / 2));
 
             g2.drawLine(x1, y1, x2, y2);
         }
