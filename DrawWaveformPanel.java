@@ -1,5 +1,7 @@
 import javax.swing.JPanel;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
@@ -13,12 +15,16 @@ public class DrawWaveformPanel extends JPanel
     {
         this.monoSamples = monoSamples;
         this.numberOfChannels = numberOfChannels;
+        setBackground(new Color(127, 117, 121));
+        setPreferredSize(new Dimension(getWidth(), getHeight() - 50));
     }
     
     public DrawWaveformPanel(float[][] stereoSamples, int numberOfChannels)
     {
         this.stereoSamples = stereoSamples;
         this.numberOfChannels = numberOfChannels;
+        setBackground(new Color(127, 117, 121));
+        setPreferredSize(new Dimension(getWidth(), getHeight() - 50));
     }
 
     @Override

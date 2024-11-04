@@ -14,7 +14,9 @@ public class AudioDataExtractor
     private int bytesPerFrame;
     private int sampleSizeInBits;
     private int numberOfChannels;
+    private long frameRateLength;
 
+    private float sampleRate;
     private float[] monoSamples;
     private float[][] stereoSamples;
 
@@ -28,6 +30,9 @@ public class AudioDataExtractor
         bytesPerFrame = audioFormat.getFrameSize();
         sampleSizeInBits = audioFormat.getSampleSizeInBits();
         numberOfChannels = audioFormat.getChannels();
+        sampleRate = audioFormat.getSampleRate();
+        frameRateLength = audioInputStream.getFrameLength();
+        
 
         if(getChannels() == 1)
         {
@@ -37,6 +42,16 @@ public class AudioDataExtractor
         {
             extractStereoSamples();
         }
+    }
+
+    public float getAudioLengthSeconds()
+    {
+        return frameRateLength / sampleRate;
+    }
+
+    public float getSampleRate()
+    {
+        return sampleRate;
     }
 
     public int getChannels()

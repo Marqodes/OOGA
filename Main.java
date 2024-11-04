@@ -1,9 +1,12 @@
+import java.awt.BorderLayout;
 import java.io.File;
 import java.io.IOException;
 
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.OverlayLayout;
 
 public class Main
 {
@@ -12,8 +15,8 @@ public class Main
     public static DrawWaveformPanel drawWaveformPanel;
     public static void main(String[] args) throws UnsupportedAudioFileException, IOException, LineUnavailableException
     {
-        File audioFile = loadFile("media\\Audio2.wav");
-        // File audioFile = loadFile("media\\JCole.wav");
+        // File audioFile = loadFile("media\\Audio2.wav");
+        File audioFile = loadFile("media\\JCole.wav");
         // File audioFile = loadFile("media\\DarkFant.wav");
         // File audioFile = loadFile("media\\LeftRight.wav");
 
@@ -28,10 +31,20 @@ public class Main
             drawWaveformPanel = new DrawWaveformPanel(audioDataExtractor.getStereoSamples(), audioDataExtractor.getChannels());
         }
 
+        TimePanel timePanel = new TimePanel(audioDataExtractor.getAudioLengthSeconds());
+        
+        JPanel waveformContainer = new JPanel();
+        waveformContainer.setLayout(new OverlayLayout(waveformContainer));
+        
+        // waveformContainer.add(timeTicksPanel);
+        waveformContainer.add(drawWaveformPanel);
+
         JFrame frame = new JFrame("OOGA");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(WIDTH, HEIGHT);
-        frame.add(drawWaveformPanel);
+        
+        frame.add(timePanel, BorderLayout.NORTH);
+        frame.add(waveformContainer, BorderLayout.CENTER);
         // frame.pack();
         frame.setVisible(true);
     }
