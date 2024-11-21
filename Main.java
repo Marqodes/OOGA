@@ -16,13 +16,17 @@ public class Main
     public static DrawWaveformPanel3 drawWaveformPanel3;
     public static void main(String[] args) throws UnsupportedAudioFileException, IOException, LineUnavailableException
     {
-        File audioFile = loadFile("media\\Audio2.wav");
-        // File audioFile = loadFile("media\\JCole.wav");
+        // File audioFile = loadFile("media\\Audio2.wav");
+        File audioFile = loadFile("media\\JCole.wav");
         // File audioFile = loadFile("media\\DarkFant.wav");
         // File audioFile = loadFile("media\\LeftRight.wav");
-
+        
+        
+        PlayheadPanel playheadPanel = new PlayheadPanel();
+        PlayAudio playAudio = new PlayAudio(audioFile, playheadPanel);
         AudioDataExtractor audioDataExtractor = new AudioDataExtractor(audioFile);
         TimePanel timePanel = new TimePanel((int) audioDataExtractor.getSampleRate());
+        WaveformButtonsPanel waveformButtonsPanel = new WaveformButtonsPanel(playAudio);
 
         if(audioDataExtractor.getChannels() == 1)
         {
@@ -36,6 +40,7 @@ public class Main
         JPanel waveformContainer = new JPanel();
         waveformContainer.setLayout(new OverlayLayout(waveformContainer));
         
+        waveformContainer.add(playheadPanel);
         waveformContainer.add(drawWaveformPanel3);
 
         JFrame frame = new JFrame("OOGA");
@@ -43,6 +48,7 @@ public class Main
         frame.setSize(WIDTH, HEIGHT);
         
         frame.add(timePanel, BorderLayout.NORTH);
+        frame.add(waveformButtonsPanel, BorderLayout.WEST);
         frame.add(waveformContainer, BorderLayout.CENTER);
         // frame.pack();
         frame.setVisible(true);

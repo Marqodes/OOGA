@@ -136,11 +136,6 @@ public class DrawWaveformPanel3 extends JPanel
         int leftChannelYCenter = panelHeight / 4; // Top half center
         int rightChannelYCenter = 3 * panelHeight / 4; // Bottom half center
 
-        // Debugging print statements
-        System.out.println("Left Channel Center Y: " + leftChannelYCenter);
-        System.out.println("Right Channel Center Y: " + rightChannelYCenter);
-        System.out.println("Panel Height: " + panelHeight);
-
         // Draw separation line
         g2.setColor(Color.RED);
         g2.drawLine(0, panelHeight / 2, panelWidth, panelHeight / 2); // Middle divider line
